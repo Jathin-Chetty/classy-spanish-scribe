@@ -1,7 +1,6 @@
 
-// Modern English–Spanish Translator page
-
 import TranslatorCard from "../components/TranslatorCard";
+import { Linkedin, Github } from "lucide-react";
 
 export default function Index() {
   return (
@@ -13,7 +12,30 @@ export default function Index() {
           Open-source &middot; Fast &middot; Client-side inference
         </span>
       </div>
+      {/* Social Icons Footer */}
+      <footer className="mt-10 flex flex-col items-center w-full">
+        <div className="flex gap-6">
+          <a
+            href="https://www.linkedin.com/in/your-profile"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition-transform duration-150 text-muted-foreground hover:text-primary"
+            aria-label="LinkedIn"
+          >
+            <Linkedin size={28} />
+          </a>
+          <a
+            href="https://github.com/your-username"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:scale-110 transition-transform duration-150 text-muted-foreground hover:text-primary"
+            aria-label="GitHub"
+          >
+            <Github size={28} />
+          </a>
+        </div>
+        <span className="text-[0.7rem] text-muted-foreground mt-2 opacity-50">Made with 🤍 by you</span>
+      </footer>
     </div>
   );
 }
-
