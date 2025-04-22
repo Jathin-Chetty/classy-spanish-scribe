@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from "react";
-import { Translate } from "lucide-react";
+import { Languages } from "lucide-react";
 
 const DEFAULT_PLACEHOLDER = "Type your English text here...";
 
@@ -14,7 +14,7 @@ async function loadTranslator() {
     translatorPipeline = await pipeline(
       "translation",
       "Xenova/opus-mt-en-es",
-      { quantized: true, progress_callback: (status: any) => {
+      { progress_callback: (status: any) => {
         // Could show progress
       }}
     );
@@ -67,7 +67,7 @@ export default function TranslatorCard() {
     <div className="max-w-2xl w-full rounded-xl shadow-smooth bg-card p-8 mx-auto">
       <div className="flex gap-3 mb-6 items-center">
         <span className="rounded-lg bg-primary/10 px-3 py-1.5 font-semibold text-primary tracking-wide text-xs flex items-center gap-0.5">
-          <Translate size={18} className="mr-1" />
+          <Languages size={18} className="mr-1" />
           English → Spanish
         </span>
       </div>
@@ -97,7 +97,7 @@ export default function TranslatorCard() {
           </>
         ) : (
           <>
-            <Translate size={20} />
+            <Languages size={20} />
             Translate
           </>
         )}
