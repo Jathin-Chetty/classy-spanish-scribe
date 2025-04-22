@@ -1,10 +1,13 @@
 
 import TranslatorCard from "../components/TranslatorCard";
 import { Linkedin, Github } from "lucide-react";
+import Header from "../components/Header";
 
 export default function Index() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary px-2 py-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary px-2 py-10 relative">
+      <Header />
+      <div className="h-20" /> {/* Spacer for header */}
       <TranslatorCard />
       <div className="mt-8 text-xs text-muted-foreground opacity-60 text-center">
         <span>
