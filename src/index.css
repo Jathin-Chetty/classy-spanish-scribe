@@ -16,15 +16,35 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-primary to-secondary min-h-screen text-foreground;
+    /* Futuristic layered gradient with a glass-overlay */
+    @apply min-h-screen text-foreground;
+    background:
+      linear-gradient(120deg, #090d25 0%, #231955 100%),
+      linear-gradient(135deg, rgba(155,135,245,0.08) 20%, rgba(211,228,253,0.15) 80%),
+      linear-gradient(101deg, #323755 40%, #141624 100%);
+    background-blend-mode: lighten, lighten, normal;
+    position: relative;
+    z-index: 0;
+    /* fallback for old browsers */
+    background-color: #181b2a;
   }
 }
 
+@layer utilities {
+  .glass-card {
+    @apply bg-white/5 border border-white/10 shadow-[0_4px_24px_-2px_rgba(155,135,245,.10)] backdrop-blur-xl;
+  }
+}
+
+/* Modern scrollbar to fit futuristic theming */
 ::-webkit-scrollbar {
   width: 10px;
-  background-color: #D3E4FD;
+  background-color: #1d1e24;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #9b87f5;
+  background: linear-gradient(135deg, #7E69AB 0%, #9b87f5 100%);
   border-radius: 6px;
+  border: 2px solid #231955;
 }
+
+/* ... keep existing code (rest of index.css the same) ... */
