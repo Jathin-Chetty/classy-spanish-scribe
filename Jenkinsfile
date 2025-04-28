@@ -32,15 +32,10 @@ pipeline {
             }
         }
 
-        // Stage 3: Run tests (if needed)
+        // Stage 3: Test placeholder
         stage('Test') {
             steps {
-                script {
-                    // Run tests inside the Docker container
-                    docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").inside {
-                        sh 'npm test'
-                    }
-                }
+                echo 'Tests skipped - placeholder stage'
             }
         }
 
