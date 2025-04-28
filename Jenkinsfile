@@ -2,30 +2,52 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'translator-webapp'
+        // Docker Hub credentials (configure these in Jenkins credentials)
+        DOCKER_CREDENTIALS = 'docker-hub-credentials'
+        // Docker image name and tag
+        DOCKER_IMAGE = 'jathinch/translator-webapp'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
+        // Stage 1: Checkout code from GitHub
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        // Stage 2: Build Docker image
+        stage('Build') {
             steps {
                 script {
+                    // Build the Docker image
                     docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                 }
             }
         }
 
-        stage('Push to Docker Hub') {
+        // Stage 3: Run tests (if needed)
+        stage('Test') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                    // Run tests inside the Docker container
+                    docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").inside {
+                        sh 'npm test'
+                    }
+                }
+            }
+        }
+
+        // Stage 4: Push to Docker Hub
+        stage('Push') {
+            steps {
+                script {
+                    // Login to Docker Hub
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS) {
+                        // Push the image with build number tag
                         docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
+                        // Also push as latest
                         docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('latest')
                     }
                 }
@@ -33,12 +55,17 @@ pipeline {
         }
     }
 
+    // Post-build actions
     post {
+        always {
+            // Clean up workspace
+            cleanWs()
+        }
         success {
-            echo 'Docker image successfully built and pushed to Docker Hub'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed!'
         }
     }
 } 
