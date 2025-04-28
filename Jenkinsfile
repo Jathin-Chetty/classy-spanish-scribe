@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'jathinch/translator-app'
-        DOCKER_TAG = 'latest'
+        DOCKER_IMAGE = 'translator-webapp'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -13,19 +13,7 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
                 script {
                     docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
@@ -33,36 +21,24 @@ pipeline {
             }
         }
 
-        stage('Docker Push') {
+        stage('Push to Docker Hub') {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
                         docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('latest')
                     }
                 }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh '''
-                    docker stop translator-app || true
-                    docker rm translator-app || true
-                    docker run -d -p 8080:80 --name translator-app ${DOCKER_IMAGE}:${DOCKER_TAG}
-                '''
             }
         }
     }
 
     post {
-        always {
-            cleanWs()
-        }
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Docker image successfully built and pushed to Docker Hub'
         }
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed'
         }
     }
 } 
