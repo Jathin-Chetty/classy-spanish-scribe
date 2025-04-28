@@ -43,12 +43,16 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    // Login to Docker Hub
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS) {
-                        // Push the image with build number tag
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                        // Also push as latest
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('latest')
+                    try {
+                        // Login to Docker Hub with explicit registry URL
+                        docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS) {
+                            // Push the image with build number tag
+                            docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
+                            // Also push as latest
+                            docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('latest')
+                        }
+                    } catch (Exception e) {
+                        error "Failed to push Docker image: ${e.message}"
                     }
                 }
             }
