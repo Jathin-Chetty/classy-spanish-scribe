@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Docker Hub credentials (configure these in Jenkins credentials)
-        DOCKER_CREDENTIALS = 'docker-hub-credentials'
+        DOCKER_CREDENTIALS = 'docker-hub-credential'
         // Docker image name and tag
         DOCKER_IMAGE = 'jathinch/translator-webapp'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
