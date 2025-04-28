@@ -1,23 +1,30 @@
-
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Languages } from "lucide-react";
 
 const DEFAULT_PLACEHOLDER = "Type your English text here...";
+const MAX_INPUT_LENGTH = 400;
+const MODEL_NAME = "Xenova/opus-mt-en-es";
 
 // We'll lazy-load the translation model only when needed
 let translatorPipeline: any = null;
 
 async function loadTranslator() {
   if (!translatorPipeline) {
-    const { pipeline } = await import("@huggingface/transformers");
-    // Helsinki-NLP/opus-mt-en-es is small and fast for English-Spanish
-    translatorPipeline = await pipeline(
-      "translation",
-      "Xenova/opus-mt-en-es",
-      { progress_callback: (status: any) => {
-        // Could show progress
-      }}
-    );
+    try {
+      const { pipeline } = await import("@huggingface/transformers");
+      translatorPipeline = await pipeline(
+        "translation",
+        MODEL_NAME,
+        { 
+          progress_callback: (status: any) => {
+            console.log("Model loading progress:", status);
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Failed to load translation model:", error);
+      throw new Error("Failed to load translation model. Please try again later.");
+    }
   }
   return translatorPipeline;
 }
@@ -28,26 +35,55 @@ export default function TranslatorCard() {
   const [loading, setLoading] = useState(false);
   const [modelLoading, setModelLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modelLoaded, setModelLoaded] = useState(false);
   const lastInputRef = useRef<string>("");
 
+  // Preload the model when the component mounts
+  useEffect(() => {
+    const preloadModel = async () => {
+      try {
+        setModelLoading(true);
+        await loadTranslator();
+        setModelLoaded(true);
+      } catch (error) {
+        setError("Failed to load translation model. Please refresh the page.");
+      } finally {
+        setModelLoading(false);
+      }
+    };
+    preloadModel();
+  }, []);
+
   const handleTranslate = async () => {
+    if (!english.trim()) return;
+    
     setError(null);
     setLoading(true);
     setSpanish("");
+    
     try {
-      setModelLoading(true);
-      const model = await loadTranslator();
-      setModelLoading(false);
+      if (!modelLoaded) {
+        setModelLoading(true);
+        await loadTranslator();
+        setModelLoaded(true);
+        setModelLoading(false);
+      }
 
       // If the user quickly clears or changes input, don't translate
       lastInputRef.current = english;
-      const output = await model(english, { max_length: 100 });
+      const output = await translatorPipeline(english, { 
+        max_length: 100,
+        num_beams: 4,
+        early_stopping: true
+      });
+      
       // Defensive: check if input changed since request started
       if (lastInputRef.current !== english) return;
+      
       setSpanish(output[0]?.translation_text || "No translation found.");
-      setLoading(false);
     } catch (e: any) {
-      setError("Model failed to translate. Try again or rephrase.");
+      setError(e.message || "Translation failed. Please try again.");
+    } finally {
       setLoading(false);
       setModelLoading(false);
     }
@@ -82,18 +118,28 @@ export default function TranslatorCard() {
         onChange={e => setEnglish(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={DEFAULT_PLACEHOLDER}
-        maxLength={400}
+        maxLength={MAX_INPUT_LENGTH}
         autoFocus
       />
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-xs text-muted-foreground">
+          {english.length}/{MAX_INPUT_LENGTH} characters
+        </span>
+        {modelLoading && (
+          <span className="text-xs text-primary">
+            Loading translation model...
+          </span>
+        )}
+      </div>
       <button
         className="w-full mt-1 py-3 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-lg rounded-xl font-semibold transition disabled:opacity-70 disabled:cursor-not-allowed mb-6 flex items-center justify-center gap-2"
         onClick={handleTranslate}
         disabled={!english.trim() || loading || modelLoading}
       >
-        {loading || modelLoading ? (
+        {loading ? (
           <>
             <span className="animate-spin mr-2 w-5 h-5 border-2 border-white border-t-primary rounded-full inline-block" /> 
-            {modelLoading ? "Loading model..." : "Translating..."}
+            Translating...
           </>
         ) : (
           <>
@@ -109,16 +155,18 @@ export default function TranslatorCard() {
       <div
         id="spanish-output"
         className={`min-h-[54px] w-full rounded-xl border border-muted bg-secondary px-4 py-3 mb-2 font-sans text-lg text-gray-800 transition whitespace-pre-line ${
-          loading || modelLoading ? "opacity-60" : ""
+          loading ? "opacity-60" : ""
         }`}
         style={{ minHeight: 54 }}
       >
-        {spanish &&
+        {spanish && (
           <span className="font-semibold text-primary block">{spanish}</span>
-        }
-        {!spanish && !loading && !modelLoading &&
-          <span className="text-gray-400">Translation will appear here...</span>
-        }
+        )}
+        {!spanish && !loading && (
+          <span className="text-gray-400">
+            {modelLoaded ? "Translation will appear here..." : "Loading translation model..."}
+          </span>
+        )}
       </div>
       {error && (
         <div className="text-red-500 mt-2 text-sm">{error}</div>
