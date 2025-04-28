@@ -13,7 +13,12 @@ pipeline {
         // Stage 1: Checkout code from GitHub
         stage('Checkout') {
             steps {
-                checkout scm
+                // Simple checkout without additional configuration
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/TranslatorUsingLovable/classy-spanish-scribe.git']]
+                ])
             }
         }
 
