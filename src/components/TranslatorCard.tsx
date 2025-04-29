@@ -112,7 +112,7 @@ export default function TranslatorCard() {
       </label>
       <textarea
         id="english-input"
-        className="w-full h-28 rounded-xl border border-muted bg-muted px-4 py-3 resize-none font-sans text-lg focus:outline-none focus:ring-2 ring-primary/30 mb-4 transition"
+        className="w-full h-28 rounded-xl border border-muted bg-muted px-4 py-3 resize-none font-sans text-lg focus:outline-none focus:ring-2 ring-primary/30 mb-4 transition text-gray-800"
         value={english}
         disabled={loading || modelLoading}
         onChange={e => setEnglish(e.target.value)}
@@ -173,7 +173,7 @@ export default function TranslatorCard() {
       )}
       <div className="flex justify-end">
         <span className="text-xs text-muted-foreground italic mt-2">
-          Powered by HuggingFace Transformers
+          Powered by {MODEL_NAME}
         </span>
       </div>
     </div>
