@@ -17,7 +17,7 @@ pipeline {
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/TranslatorUsingLovable/classy-spanish-scribe.git']]
+                    userRemoteConfigs: [[url: 'https://github.com/Jathin-Chetty/classy-spanish-scribe.git']]
                 ])
             }
         }
