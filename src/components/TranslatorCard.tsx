@@ -173,7 +173,7 @@ export default function TranslatorCard() {
       )}
       <div className="flex justify-end">
         <span className="text-xs text-muted-foreground italic mt-2">
-          Powered by huggingface {MODEL_NAME}
+          Powered by {MODEL_NAME}
         </span>
       </div>
     </div>
