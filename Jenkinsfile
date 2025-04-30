@@ -7,6 +7,8 @@ pipeline {
         // Docker image name and tag
         DOCKER_IMAGE = 'jathinch/translator-webapp'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
+        // Local container name
+        CONTAINER_NAME = 'translator-webapp-container'
     }
 
     stages {
@@ -53,6 +55,35 @@ pipeline {
                         }
                     } catch (Exception e) {
                         error "Failed to push Docker image: ${e.message}"
+                    }
+                }
+            }
+        }
+
+        // Stage 5: Deploy Local Container
+        stage('Deploy Local') {
+            steps {
+                script {
+                    try {
+                        // Stop and remove existing container if it exists
+                        sh "docker stop ${CONTAINER_NAME} || true"
+                        sh "docker rm ${CONTAINER_NAME} || true"
+                        
+                        // Pull the latest image
+                        sh "docker pull ${DOCKER_IMAGE}:latest"
+                        
+                        // Run the new container
+                        sh """
+                            docker run -d \
+                                --name ${CONTAINER_NAME} \
+                                -p 8080:80 \
+                                --restart unless-stopped \
+                                ${DOCKER_IMAGE}:latest
+                        """
+                        
+                        echo "Local container updated successfully!"
+                    } catch (Exception e) {
+                        error "Failed to update local container: ${e.message}"
                     }
                 }
             }
