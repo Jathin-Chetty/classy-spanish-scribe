@@ -34,7 +34,7 @@ export default function Index() {
             <Github size={28} />
           </a>
         </div>
-        <span className="text-[0.7rem] text-muted-foreground mt-2 opacity-50">Made with 🤍 by you</span>
+        <span className="text-[0.7rem] text-muted-foreground mt-2 opacity-50">Made by jathin</span>
       </footer>
     </div>
   );
