@@ -65,9 +65,9 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Use docker-compose to deploy the container on port 8181
-                        sh "docker-compose down || true"
-                        sh "docker-compose up -d --force-recreate"
+                        // Use docker compose to deploy the container on port 8181
+                        sh "docker compose down || true"
+                        sh "docker compose up -d --force-recreate"
                         echo "Local container updated successfully!"
                     } catch (Exception e) {
                         error "Failed to update local container: ${e.message}"
