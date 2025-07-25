@@ -65,6 +65,8 @@ pipeline {
             steps {
                 script {
                     try {
+                        // Remove any existing container with the same name to avoid conflicts
+                        sh "docker rm -f translator-webapp-container || true"
                         // Use docker compose to deploy the container on port 8181
                         sh "docker compose down || true"
                         sh "docker compose up -d --force-recreate"
