@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  translator-webapp:
+    image: jathinch/translator-webapp:latest
+    container_name: translator-webapp-container
+    ports:
+      - "8181:80"
+    restart: unless-stopped 
